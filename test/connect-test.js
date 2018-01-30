@@ -1,8 +1,8 @@
 const { CuratorFrameworkFactory } = require('../index');
 let client;
 client = CuratorFrameworkFactory.builder()
-.connectString(`${process.env.ZK_URL}`)
-.namespace('/')
+.connectString(process.env.ZK_URL1)
+.namespace('a')
 .build(main);   // 连接成功后的回调函数
 
 // 打开连接

@@ -13,7 +13,7 @@ $ npm install zk-curator
 const { CuratorFrameworkFactory }  = require('zk-curator');
 let client;
 client = CuratorFrameworkFactory.builder()
-.connectString(`${process.env.ZK_URL}`)
+.connectString(process.env.ZK_URL)
 .namespace(`http`)
 .build(main);   // 连接成功后的回调函数
 
@@ -54,8 +54,8 @@ const log4jsConfig = require('../config/log4js.json');
 log4js.configure(log4jsConfig);
 let client;
 client = CuratorFrameworkFactory.builder()
-    .connectString(serviceConfig.zkServer)
-    .namespace(``)
+    .connectString(process.env.ZK_URL)
+    .namespace(`http`)
     .setLogger(log4js.getLogger('zookeeper'))
     .build(main);
 client.start();
