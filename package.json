@@ -1,0 +1,19 @@
+{
+  "name": "zk-curator",
+  "version": "1.0.0",
+  "dependencies": {
+    "node-zookeeper-client": "^0.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wenshaoyan/zk-curator"
+  },
+  "description": "nodejs连接zookeeper(curator风格) ",
+  "keywords": [
+    "zk",
+    "zookeeper"
+  ],
+  "author": "wenshao314106@163.com",
+  "license": "MIT",
+  "main": "index.js"
+}
