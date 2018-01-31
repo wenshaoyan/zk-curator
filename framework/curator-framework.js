@@ -27,7 +27,6 @@ class CuratorFramework {
             }
             callback();
         });
-        this._client.on('close')
     }
 
 
