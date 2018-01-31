@@ -1,9 +1,9 @@
 # zk-curator
 zookeeper客户端 nodejs版本，和curator的api风格一致。
-主要对node-zookeeper-client进行了二次封装。
+主要对[node-zookeeper-client](https://github.com/alexguan/node-zookeeper-client)进行了二次封装。
 
 
-## 安装
+## Install
 
 ```bash
 $ npm install zk-curator
@@ -26,26 +26,36 @@ async function main() {
 
 ```
 
-## 实例
+## Example
 
 
 
 
-## 连接
-### 构造CuratorFrameworkFactory
+
+## Documentation
+### 连接
+##### 构造CuratorFrameworkFactory
+```js
 const { CuratorFrameworkFactory } = require('zk-curator');
 const curatorFrameworkFactory = CuratorFrameworkFactory.builder()
 
-### 设置连接地址 
+```
+
+##### connectString 设置连接地址 
 url:zookeeper连接地址 多个以逗号隔开(ip:port;ip:port)
-curatorFrameworkFactor.connectString(url)
+```js
+curatorFrameworkFactor.connectString(url);
+```
 
-### 设置当前连接的namespace (命名空间)
+##### namespace 
+设置当前连接的namespace (命名空间)
 str:如http/develop  不能以/开头
-curatorFrameworkFactor.namespace(str)
+```js
+curatorFrameworkFactor.namespace(str);
+```
 
 
-### 设置日志 
+##### setLogger 设置日志 
 logger: 推荐使用log4js获取指定日志类 需要包括info等标准方法</br>
 curatorFrameworkFactor.setLogger(logger)</br>
 ```js
@@ -65,9 +75,17 @@ async function main() {
 }
 
 ```
-### 
+##### build  创建client 
+```js
+curatorFrameworkFactor.build(function);
+```
 
- 
+
+## client
+连接zookeeper服务客户端
 
 
-
+##### start 开始连接
+```js
+client.start();
+```

@@ -11,7 +11,8 @@ const GetDataBuilder = require('./builder/get-data-builder');
 class CuratorFramework {
 
     constructor(curatorFrameworkFactory, callback) {
-        this._client = zookeeper.createClient(curatorFrameworkFactory.address);
+        this._client = zookeeper.createClient(curatorFrameworkFactory.address,
+            curatorFrameworkFactory.options ? curatorFrameworkFactory.options : undefined);
         this._curatorFrameworkFactory = curatorFrameworkFactory;
         this._client.once('connected', async() => {
             if (this.curatorFrameworkFactory.isPrintLog())
@@ -26,6 +27,7 @@ class CuratorFramework {
             }
             callback();
         });
+        this._client.on('close')
     }
 
 

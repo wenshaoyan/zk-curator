@@ -14,6 +14,7 @@ const CuratorFrameworkFactory = (function () {
             this._space = '/';
             this._logger = null;
             this[_isPrintLog] = false;
+            this._options = null;
         }
 
         static builder() {
@@ -48,6 +49,14 @@ const CuratorFrameworkFactory = (function () {
             this._logger = value;
         }
 
+        get options() {
+            return this._options;
+        }
+
+        set options(value) {
+            this._options = value;
+        }
+
         isPrintLog (){
             return this[_isPrintLog];
         }
@@ -78,7 +87,12 @@ const CuratorFrameworkFactory = (function () {
             throw new Error('func not is Logger object');
 
         }
-
+        setOptions(option) {
+            if (option) {
+                this.options = option;
+            }
+            return this;
+        }
         build(callback) {
             return new CuratorFramework(this, callback);
 
