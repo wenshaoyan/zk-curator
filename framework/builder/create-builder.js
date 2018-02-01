@@ -6,20 +6,9 @@ const ZkConstant = require('../../constant/zk-Constant');
 const defaultMode = 0;
 const Api = require('../../lib/api');
 const BasicBuilder = require('./basic-builder');
-const os = require('os');
 
-const getLocalIp = () => {
-	const interfaces = os.networkInterfaces();
-	for(let devName in interfaces){
-		let iface = interfaces[devName];
-		for(let i=0;i<iface.length;i++){
-			let alias = iface[i];
-			if(alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal){
-				return alias.address;
-			}
-		}
-	}
-};
+
+
 class CreateBuilder extends BasicBuilder{
     constructor(conn,namespace) {
         super(conn,namespace);
@@ -27,7 +16,7 @@ class CreateBuilder extends BasicBuilder{
         this._mode = 0;
         this._execResult = null;
         this._nodePath = null;
-        this._nodeData = getLocalIp();
+        this._nodeData = '';
         this._absoluteAddress = false;
 
     }
@@ -127,7 +116,7 @@ class CreateBuilder extends BasicBuilder{
             let index = 0;
             let defMap = new Map();
             defMap.set('mode',defaultMode);
-            defMap.set('data',Util.getLocalIp());
+            defMap.set('data','');
             let generatePath;
             for (let value of split){
                 index++;
