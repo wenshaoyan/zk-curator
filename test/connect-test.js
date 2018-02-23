@@ -12,5 +12,6 @@ client = CuratorFrameworkFactory.builder()
 client.start();
 
 async function main() {
-    console.log('连接成功')
+    console.log('连接成功');
+    client.close();
 }

@@ -46,6 +46,9 @@ class CuratorFramework {
         this._client = value;
     }
 
+    /**
+     * 连接
+     */
     start() {
         if (this.curatorFrameworkFactory.isPrintLog())
             this.curatorFrameworkFactory.logger.info('zookeeper connecting..');
@@ -53,6 +56,13 @@ class CuratorFramework {
         return this;
     }
 
+    /**
+     * 关闭
+     */
+    close() {
+        this.client.close();
+
+    }
     create() {
         return new CreateBuilder(this.client, this.curatorFrameworkFactory.space);
     }
