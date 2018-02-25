@@ -108,8 +108,9 @@ class CreateBuilder extends BasicBuilder{
         split.shift();
         const checkResultFirst = await Api.exists(this.conn,this.nodePath);
         if (checkResultFirst){
+            console.log(checkResultFirst)
             //throw new Error('path exists:'+_nodePath);
-            await Api.remove(this.conn,this.nodePath,-1);
+            // await Api.remove(this.conn,this.nodePath,-1);
         }
         let path = '';
         if (this.isParent && split.length>2) {

@@ -2,7 +2,12 @@
 zookeeper客户端 nodejs版本，和curator的api风格一致。
 主要对[node-zookeeper-client](https://github.com/alexguan/node-zookeeper-client)进行了二次封装。
 
-
+## 对比node-zookeeper-client的新功能
+- 基于Promise调用
+- Fluent风格的API接口
+- 递归创建、删除节点
+- 命名空间
+- 实时获取某个节点及该节点下所有子节点的信息 
 ## Install
 
 ```bash
@@ -75,17 +80,6 @@ async function main() {
 }
 
 ```
-##### build  创建client 
-```js
-curatorFrameworkFactor.build(function);
-```
 
+### client
 
-## client
-连接zookeeper服务客户端
-
-
-##### start 开始连接
-```js
-client.start();
-```

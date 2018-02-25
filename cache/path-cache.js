@@ -4,13 +4,14 @@
  */
 'use strict';
 const {switchCallback} = require('./cache-util');
-class NodeCache {
+class PathCache {
     constructor(client, path) {
         this._client = client;
         this._path = path;
         this._state = null;
         this._data = null;
         this._callbacks = null;
+        this._children = null;
     }
 
     get client() {
@@ -38,6 +39,15 @@ class NodeCache {
         this._data = value;
     }
 
+
+    get children() {
+        return this._children;
+    }
+
+    set children(value) {
+        this._children = value;
+    }
+
     /**
      * 开始cache
      */
@@ -49,6 +59,7 @@ class NodeCache {
         this.state = await this.client.checkExists()
             .unwantedNamespace()
             .setWatcher(this.client, async(_client, event) => {   // 监听创建和删除
+                console.log(event, this.children)
                 if (event.getType() === 1) {    // 创建
                     await this.listener();
                     this.callbacks.nodeCreate();
@@ -56,9 +67,22 @@ class NodeCache {
                     await this.listener();
                     this.data = null;
                     this.callbacks.nodeRemove();
-                } else if (event.getType() === 3) {
+                } else if (event.getType() === 3) { // 数据变化
                     await this.listener();
                     this.callbacks.nodeDataChange();
+                } else if (event.getType() === 4) {
+                    let oldLen = 0;
+                    let newLen;
+                    if (this.children instanceof Array) {
+                        oldLen = this.children.length;
+                    }
+                    await this.listener();
+                    if (this.children instanceof Array) {
+                        newLen = this.children.length;
+                    }
+                    if (newLen > oldLen) this.callbacks.childAdd();
+                    else this.callbacks.childRemove()
+
                 }
             })
             .forPath(this.path);
@@ -66,6 +90,12 @@ class NodeCache {
             this.data = await this.client.getData()
                 .unwantedNamespace()
                 .forPath(this.path);
+            this.children = await this.client.getChildren()
+                .unwantedNamespace()
+                .forPath(this.path);
+            console.log(this.children)
+
+
         }
     }
 
@@ -77,4 +107,4 @@ class NodeCache {
         this.callbacks = switchCallback(callbacks);
     }
 }
-module.exports = NodeCache;
+module.exports = PathCache;
