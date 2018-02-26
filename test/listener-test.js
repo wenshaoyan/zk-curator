@@ -5,6 +5,7 @@
 const { CuratorFrameworkFactory } = require('../index');
 const NodeCache = require('../cache/node-cache');
 const PathCache = require('../cache/path-cache');
+const TreeCache = require('../cache/tree-cache');
 let client;
 client = CuratorFrameworkFactory.builder()
     .connectString(process.env.ZK_URL)
@@ -40,17 +41,19 @@ async function main() {
         });
         nodeCache.start();*/
 
-        const pathCache = new PathCache(client,'/test');
+        /*const pathCache = new PathCache(client,'/test');
         pathCache.addListener({
             childAdd: function () {
                 console.log('childAdd');
                 console.log(pathCache.state);
                 console.log(pathCache.data)
+                console.log(pathCache.children)
             },
             childRemove: function () {
                 console.log('childRemove');
                 console.log(pathCache.state);
                 console.log(pathCache.data)
+                console.log(pathCache.children)
 
             },
             nodeCreate: function () {
@@ -70,8 +73,33 @@ async function main() {
                 console.log(pathCache.data);
             }
         });
-        pathCache.start();
+        pathCache.start();*/
+        const treeCache = new TreeCache(client,'/test');
+        treeCache.addListener({
+            childAdd: function () {
+                console.log('childAdd');
+                console.log(treeCache.data)
+            },
+            childRemove: function () {
+                console.log('childRemove');
+                console.log(treeCache.data)
 
+            },
+            nodeCreate: function () {
+                console.log('nodeCreate')
+                // console.log(treeCache.data)
+            },
+            nodeRemove: function () {
+                console.log('nodeRemove');
+                // console.log(treeCache.data)
+
+            },
+            nodeDataChange: function () {
+                console.log('nodeDataChange');
+                console.log(treeCache.data)
+            }
+        });
+        treeCache.start();
 
     // console.log(result)
     }catch (e){

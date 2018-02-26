@@ -8,18 +8,19 @@ const CreateBuilder = require('./builder/create-builder');
 const ExistsBuilder = require('./builder/exists-builder');
 const GetChildrenBuilder = require('./builder/get-children-builder');
 const GetDataBuilder = require('./builder/get-data-builder');
+
 class CuratorFramework {
 
     constructor(curatorFrameworkFactory, callback) {
         this._client = zookeeper.createClient(curatorFrameworkFactory.address,
             curatorFrameworkFactory.options ? curatorFrameworkFactory.options : undefined);
         this._curatorFrameworkFactory = curatorFrameworkFactory;
-        this._client.once('connected', async() => {
+        this._client.once('connected', async () => {
             if (this.curatorFrameworkFactory.isPrintLog())
                 this.curatorFrameworkFactory.logger.info('zookeeper connect succeed');
             const createBuilder = this.create()
-                .creatingParentContainersIfNeeded()
-                .unwantedNamespace();
+            .creatingParentContainersIfNeeded()
+            .unwantedNamespace();
             try {
                 await createBuilder.forPath(this.curatorFrameworkFactory.space, null);
             } catch (e) {
@@ -63,19 +64,22 @@ class CuratorFramework {
         this.client.close();
 
     }
+
     create() {
         return new CreateBuilder(this.client, this.curatorFrameworkFactory.space);
     }
-    checkExists(){
-        return new ExistsBuilder(this.client,this.curatorFrameworkFactory.space);
-    }
 
+    checkExists() {
+        return new ExistsBuilder(this.client, this.curatorFrameworkFactory.space);
+    }
 
     getChildren() {
-        return new GetChildrenBuilder(this.client,this.curatorFrameworkFactory.space);
+        return new GetChildrenBuilder(this.client, this.curatorFrameworkFactory.space);
     }
+
     getData() {
-        return new GetDataBuilder(this.client,this.curatorFrameworkFactory.space);
+        return new GetDataBuilder(this.client, this.curatorFrameworkFactory.space);
     }
 }
+
 module.exports = CuratorFramework;

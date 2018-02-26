@@ -62,7 +62,7 @@ const CuratorFrameworkFactory = (function () {
         }
         connectString(address) {
             if (typeof address !== 'string') {
-                throw new Error('address not is string');
+                throw new Error('zookeeper connect address not is string');
             }
             this.address = address;
             return this;

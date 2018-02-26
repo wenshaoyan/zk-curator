@@ -10,7 +10,7 @@ class ExistsBuilder extends BasicBuilder {
         super(conn, namespace);
         this._watcherCallback = null;
         this._path = null;
-
+        this._isClean = false;
     }
 
     get watcherCallback() {
@@ -29,6 +29,14 @@ class ExistsBuilder extends BasicBuilder {
         this._path = value;
     }
 
+    get isClean() {
+        return this._isClean;
+    }
+
+    set isClean(value) {
+        this._isClean = value;
+    }
+
     setWatcher(_client, callback) {
         if (callback instanceof Function && _client) {
             this.watcherCallback = (event) => {
@@ -38,11 +46,18 @@ class ExistsBuilder extends BasicBuilder {
         return this;
     }
 
+    setCleanWatchers() {
+        this.isClean = true;
+        return this;
+    }
+
     forPath(path) {
         if (path) this.path = path;
+        if (this.isClean) this.cleanWatchers({location: 'data', path: this.path});
         return Api.exists(this.conn, this.isNamespace ? this.namespace + path : path, this.watcherCallback);
     }
 
 
 }
+
 module.exports = ExistsBuilder;

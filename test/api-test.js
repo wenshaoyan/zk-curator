@@ -23,9 +23,9 @@ async function main() {
             port: 3000
         }));
     console.log(id);
-    setTimeout(function () {
+    /*setTimeout(function () {
         client.close();
-    },10000);
+    },10000);*/
 }
 process.on('exit',function(code){
     client.close(); // 释放zookeeper连接

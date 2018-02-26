@@ -1,6 +1,6 @@
 /**
  * Created by yanshaowen on 2017/9/12
- * 监视一个结点的创建、更新、删除，并将结点的数据缓存在本地。
+ * 监视一个结点的创建、更新、删除，子节点的创建更新，并将结点的数据缓存在本地。
  */
 'use strict';
 const {switchCallback} = require('./cache-util');
@@ -48,54 +48,71 @@ class PathCache {
         this._children = value;
     }
 
+
+    get state() {
+        return this._state;
+    }
+
+    set state(value) {
+        this._state = value;
+    }
+
     /**
      * 开始cache
      */
     start() {
-        this.listener();
+        this.listener('init');
     }
 
-    async listener() {
-        this.state = await this.client.checkExists()
+    /**
+     *
+     * @param nodeType   节点的状态   init:启动或者节点创建时候的状态  node:该节点删除或数据变化时候的状态  child:子节点创建或删除时候的状态
+     */
+    async listener(nodeType) {
+        if (nodeType === 'init' || nodeType === 'node') {
+            this.state = await this.client.checkExists()
             .unwantedNamespace()
             .setWatcher(this.client, async(_client, event) => {   // 监听创建和删除
-                console.log(event, this.children)
                 if (event.getType() === 1) {    // 创建
-                    await this.listener();
+                    await this.listener('init');
                     this.callbacks.nodeCreate();
                 } else if (event.getType() === 2) { // 删除
-                    await this.listener();
+                    await this.listener('node');
                     this.data = null;
                     this.callbacks.nodeRemove();
                 } else if (event.getType() === 3) { // 数据变化
-                    await this.listener();
+                    await this.listener('node');
                     this.callbacks.nodeDataChange();
-                } else if (event.getType() === 4) {
-                    let oldLen = 0;
-                    let newLen;
-                    if (this.children instanceof Array) {
-                        oldLen = this.children.length;
-                    }
-                    await this.listener();
-                    if (this.children instanceof Array) {
-                        newLen = this.children.length;
-                    }
-                    if (newLen > oldLen) this.callbacks.childAdd();
-                    else this.callbacks.childRemove()
-
                 }
             })
             .forPath(this.path);
+        }
         if (this.state) {
-            this.data = await this.client.getData()
+            if (nodeType === 'init' || nodeType === 'node') {
+                this.data = await this.client.getData()
                 .unwantedNamespace()
                 .forPath(this.path);
-            this.children = await this.client.getChildren()
+            }
+            if (nodeType === 'init' || nodeType === 'child') {
+                this.children = await this.client.getChildren()
                 .unwantedNamespace()
+                .setWatcher(this.client, async (_client, event) => {   // 监听创建和删除
+                    if (event.getType() === 4) {
+                        let oldLen = 0;
+                        let newLen;
+                        if (this.children instanceof Array) {
+                            oldLen = this.children.length;
+                        }
+                        await this.listener('child');
+                        if (this.children instanceof Array) {
+                            newLen = this.children.length;
+                        }
+                        if (newLen > oldLen) this.callbacks.childAdd();
+                        else this.callbacks.childRemove()
+                    }
+                })
                 .forPath(this.path);
-            console.log(this.children)
-
-
+            }
         }
     }
 

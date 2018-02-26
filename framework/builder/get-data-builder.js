@@ -12,6 +12,7 @@ class GetDataBuilder extends BasicBuilder {
         this._state = new Stat();
         this._watcherCallback = null;
         this._path = null;
+        this._isClean = false;
     }
 
     get state() {
@@ -38,8 +39,21 @@ class GetDataBuilder extends BasicBuilder {
         this._watcherCallback = value;
     }
 
+
+    get isClean() {
+        return this._isClean;
+    }
+
+    set isClean(value) {
+        this._isClean = value;
+    }
+
     storingStatIn(_state) {
         this.state = _state;
+        return this;
+    }
+    setCleanWatchers() {
+        this.isClean = true;
         return this;
     }
 
@@ -60,6 +74,7 @@ class GetDataBuilder extends BasicBuilder {
 
     forPath(path) {
         if (path) this.path = path;
+        if (this.isClean) this.cleanWatchers({location: 'data', path: this.path});
         return Api.getData(this.conn, this.isNamespace ? this.namespace + path : path, this.watcherCallback, this.state);
     }
 

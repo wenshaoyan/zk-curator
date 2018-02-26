@@ -107,9 +107,8 @@ class CreateBuilder extends BasicBuilder{
         if (split[split.length-1] === '') split.pop();
         split.shift();
         const checkResultFirst = await Api.exists(this.conn,this.nodePath);
-        if (checkResultFirst){
-            console.log(checkResultFirst)
-            //throw new Error('path exists:'+_nodePath);
+        if (checkResultFirst){  // 去除删除namespace的首路径的逻辑
+            // throw new Error('path exists:'+_nodePath);
             // await Api.remove(this.conn,this.nodePath,-1);
         }
         let path = '';

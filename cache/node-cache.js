@@ -38,6 +38,15 @@ class NodeCache {
         this._data = value;
     }
 
+
+    get state() {
+        return this._state;
+    }
+
+    set state(value) {
+        this._state = value;
+    }
+
     /**
      * 开始cache
      */
