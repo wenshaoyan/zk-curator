@@ -3,63 +3,38 @@
  * 监视一个结点的创建、更新、删除，及子节点的创建、更新、删除， 从数并将结点的数据缓存在本地。
  */
 'use strict';
-const {switchCallback} = require('./cache-util');
-const a = {
-    "test": {
-        id: "test",
-        path: "/path",
-        data: "",
-        state: "",
-        children: {}
-    }
-};
+const BaseCache = require('./base-cache');
 
-class PathCache {
-    constructor(client, path) {
-        this._client = client;
-        this._path = path;
-        this._data = {};
-        this._callbacks = null;
+class TreeCache extends BaseCache {
+    // deep: 树的最大层级 默认不限制
+    constructor(client, path, maxDeep) {
+        super(client, path);
+        if (typeof maxDeep === 'number' && maxDeep > -1) {
+            this._maxDeep = parseInt(maxDeep);
+        } else {
+            this._maxDeep = -1;
+        }
     }
 
-    get client() {
-        return this._client;
+    get maxDeep() {
+        return this._maxDeep;
     }
 
-    set client(value) {
-        this._client = value;
+    set maxDeep(value) {
+        this._maxDeep = value;
     }
-
-    get path() {
-        return this._path;
-    }
-
-    set path(value) {
-        this.data.root.path = value;
-        this._path = value;
-    }
-
-
-    get data() {
-        return this._data;
-    }
-
-    set data(value) {
-        this._data = value;
-    }
-
 
     /**
      * 开始cache
      */
     start() {
-        let id = 'root';
-        if (this.path) {
-            const list = this.path.split('/');
-            if (list) id = list[list.length - 1]
+        this.listener('init', this.data, 'root', this.path);
+    }
 
-        }
-        this.listener('init', this.data, id, this.path);
+    relativeDeep(inputPath) {
+        const referenceDeep = this.path.split('/').length;
+        const comparisonDeep = inputPath.split('/').length;
+        return comparisonDeep - referenceDeep;
     }
 
     /**
@@ -72,9 +47,16 @@ class PathCache {
      * @param parentPath       当前子节点key
      */
     async listener(nodeType, parentData, nodeKey, parentPath) {
+        if (this.maxDeep !== -1 && this.relativeDeep(parentPath) > this.maxDeep) {
+            return;
+        }
+
         if (!(nodeKey in parentData)) {
+            const split = parentPath.split('/');
+            const id = split[split.length - 1];
+            console.log(id)
             parentData[nodeKey] = {
-                id: nodeKey,
+                id: id,
                 path: parentPath
             };
         }
@@ -86,14 +68,14 @@ class PathCache {
             .setWatcher(this.client, async (_client, event) => {   // 监听创建和删除
                 if (event.getType() === 1) {    // 创建
                     await this.listener('init', parentData, nodeKey, parentPath);
-                    this.callbacks.nodeCreate();
+                    this.callbacks.nodeCreate(this, this.relativeDeep(parentPath));
                 } else if (event.getType() === 2) { // 删除
                     await this.listener('node', parentData, nodeKey, parentPath);
                     delete parentData[nodeKey];
-                    this.callbacks.nodeRemove();
+                    this.callbacks.nodeRemove(this, this.relativeDeep(parentPath));
                 } else if (event.getType() === 3) { // 数据变化
                     await this.listener('node', parentData, nodeKey, parentPath);
-                    this.callbacks.nodeDataChange();
+                    this.callbacks.nodeDataChange(this, this.relativeDeep(parentPath));
                 }
             })
             .forPath(parentPath);
@@ -110,37 +92,30 @@ class PathCache {
                 .setCleanWatchers()
                 .setWatcher(this.client, async (_client, event) => {   // 监听创建和删除
                     if (event.getType() === 4) {
-                        let oldLen = Object.keys(current.children).length;
+                        let oldLen = current.children.length;
                         let newLen;
                         await this.listener('child', parentData, nodeKey, parentPath);
-                        newLen = Object.keys(current.children).length;
-                        if (newLen > oldLen) this.callbacks.childAdd();
-                        else this.callbacks.childRemove()
+                        newLen = current.children.length;
+                        if (newLen > oldLen) this.callbacks.childAdd(this, this.relativeDeep(parentPath));
+                        else this.callbacks.childRemove(this, this.relativeDeep(parentPath))
                     }
                 })
                 .forPath(parentPath);
 
-                current.children = {};
+                current.childrenData = {};
+                current.children = children;
                 for (const node of children) {
-                    current.children[node] = {
+                    current.childrenData[node] = {
                         id: node,
                         path: parentPath + '/' + node
                     };
-                    await this.listener('init', current.children, node, parentPath + '/' + node);
+                    await this.listener('init', current.childrenData, node, parentPath + '/' + node);
                 }
 
             }
         }
         // console.log(JSON.stringify(this.data))
     }
-
-    /**
-     *
-     * @param callbacks
-     */
-    addListener(callbacks) {
-        this.callbacks = switchCallback(callbacks);
-    }
 }
 
-module.exports = PathCache;
+module.exports = TreeCache;

@@ -2,10 +2,7 @@
  * Created by wenshao on 2018/2/25.
  */
 'use strict';
-const { CuratorFrameworkFactory } = require('../index');
-const NodeCache = require('../cache/node-cache');
-const PathCache = require('../cache/path-cache');
-const TreeCache = require('../cache/tree-cache');
+const { CuratorFrameworkFactory, NodeCache, PathCache, TreeCache} = require('../index');
 let client;
 client = CuratorFrameworkFactory.builder()
     .connectString(process.env.ZK_URL)
@@ -22,80 +19,69 @@ async function main() {
     try{
         /*const nodeCache = new NodeCache(client,'/test/create');
         nodeCache.addListener({
-            nodeCreate: function () {
-                console.log('nodeCreate')
-                console.log(nodeCache.state)
-                console.log(nodeCache.data)
+            nodeCreate: function (cache, deep) {
+                console.log('nodeCreate',deep)
+                console.log(cache.data)
             },
-            nodeRemove: function () {
-                console.log('nodeRemove');
-                console.log(nodeCache.state)
-                console.log(nodeCache.data)
+            nodeRemove: function (cache, deep) {
+                console.log('nodeRemove',deep);
+                console.log(cache.data)
 
             },
-            nodeDataChange: function () {
-                console.log('nodeDataChange')
-                console.log(nodeCache.state)
-                console.log(nodeCache.data)
+            nodeDataChange: function (cache, deep) {
+                console.log('nodeDataChange',deep)
+                console.log(cache.data)
             }
         });
         nodeCache.start();*/
 
         /*const pathCache = new PathCache(client,'/test');
         pathCache.addListener({
-            childAdd: function () {
+            childAdd: function (cache, deep) {
                 console.log('childAdd');
-                console.log(pathCache.state);
-                console.log(pathCache.data)
-                console.log(pathCache.children)
+                console.log(cache.data)
             },
-            childRemove: function () {
+            childRemove: function (cache, deep) {
                 console.log('childRemove');
-                console.log(pathCache.state);
-                console.log(pathCache.data)
-                console.log(pathCache.children)
+                console.log(cache.data)
 
             },
-            nodeCreate: function () {
+            nodeCreate: function (cache, deep) {
                 console.log('nodeCreate')
-                console.log(pathCache.state)
-                console.log(pathCache.data)
+                console.log(cache.data)
             },
-            nodeRemove: function () {
+            nodeRemove: function (cache, deep) {
                 console.log('nodeRemove');
-                console.log(pathCache.state)
-                console.log(pathCache.data)
+                console.log(cache.data)
 
             },
-            nodeDataChange: function () {
+            nodeDataChange: function (cache, deep) {
                 console.log('nodeDataChange');
-                console.log(pathCache.state);
-                console.log(pathCache.data);
+                console.log(cache.data);
             }
         });
         pathCache.start();*/
-        const treeCache = new TreeCache(client,'/test');
+        const treeCache = new TreeCache(client,'/test', 2);
         treeCache.addListener({
-            childAdd: function () {
-                console.log('childAdd');
-                console.log(treeCache.data)
+            childAdd: function (cache, deep) {
+                console.log('childAdd',deep);
+                console.log(JSON.stringify(treeCache.data))
             },
-            childRemove: function () {
-                console.log('childRemove');
+            childRemove: function (cache, deep) {
+                console.log('childRemove',deep);
                 console.log(treeCache.data)
 
             },
-            nodeCreate: function () {
-                console.log('nodeCreate')
+            nodeCreate: function (cache, deep) {
+                console.log('nodeCreate', deep)
                 // console.log(treeCache.data)
             },
-            nodeRemove: function () {
-                console.log('nodeRemove');
+            nodeRemove: function (cache, deep) {
+                console.log('nodeRemove', deep);
                 // console.log(treeCache.data)
-
             },
-            nodeDataChange: function () {
-                console.log('nodeDataChange');
+            nodeDataChange: function (cache, deep) {
+                console.log('nodeDataChange', deep);
                 console.log(treeCache.data)
             }
         });

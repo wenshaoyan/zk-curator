@@ -5,6 +5,8 @@
 exports.CuratorFrameworkFactory = require('./framework/curator-framework-factory');
 exports.Stat = require('./lib/stat');
 exports.NodeCache = require('./cache/node-cache');
+exports.PathCache = require('./cache/path-cache');
+exports.TreeCache = require('./cache/tree-cache');
 const NodesInfo = require('./lib/nodes-info');
 /**
  * 获取节点的信息和子节点信息

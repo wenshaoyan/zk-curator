@@ -8,6 +8,7 @@ const CreateBuilder = require('./builder/create-builder');
 const ExistsBuilder = require('./builder/exists-builder');
 const GetChildrenBuilder = require('./builder/get-children-builder');
 const GetDataBuilder = require('./builder/get-data-builder');
+const DeleteBuilder = require('./builder/delete-builder');
 
 class CuratorFramework {
 
@@ -79,6 +80,9 @@ class CuratorFramework {
 
     getData() {
         return new GetDataBuilder(this.client, this.curatorFrameworkFactory.space);
+    }
+    delete() {
+        return new DeleteBuilder(this.client, this.curatorFrameworkFactory.space);
     }
 }
 
