@@ -17,75 +17,76 @@ client.start();
 async function main() {
     // console.log('连接成功');
     try{
-        /*const nodeCache = new NodeCache(client,'/test/create');
+        const nodeCache = new NodeCache(client,'/test/create');
         nodeCache.addListener({
             nodeCreate: function (cache, deep) {
                 console.log('nodeCreate',deep)
-                console.log(cache.data)
+                console.log(cache.getData())
             },
             nodeRemove: function (cache, deep) {
                 console.log('nodeRemove',deep);
-                console.log(cache.data)
+                console.log(cache.getData())
 
             },
             nodeDataChange: function (cache, deep) {
                 console.log('nodeDataChange',deep)
-                console.log(cache.data)
+                console.log(cache.getData())
             }
         });
-        nodeCache.start();*/
+        nodeCache.start();
 
         /*const pathCache = new PathCache(client,'/test');
         pathCache.addListener({
             childAdd: function (cache, deep) {
                 console.log('childAdd');
-                console.log(cache.data)
+                console.log(cache.getData())
             },
             childRemove: function (cache, deep) {
                 console.log('childRemove');
-                console.log(cache.data)
+                console.log(cache.getData())
 
             },
             nodeCreate: function (cache, deep) {
                 console.log('nodeCreate')
-                console.log(cache.data)
+                console.log(cache.getData())
             },
             nodeRemove: function (cache, deep) {
                 console.log('nodeRemove');
-                console.log(cache.data)
+                console.log(cache.getData())
 
             },
             nodeDataChange: function (cache, deep) {
                 console.log('nodeDataChange');
-                console.log(cache.data);
+                console.log(cache.getData());
             }
         });
-        pathCache.start();*/
+        await pathCache.start();
+        console.log(pathCache.getData());
         const treeCache = new TreeCache(client,'/test', 2);
         treeCache.addListener({
             childAdd: function (cache, deep) {
                 console.log('childAdd',deep);
-                console.log(JSON.stringify(treeCache.data))
+                console.log(cache.getData())
             },
             childRemove: function (cache, deep) {
                 console.log('childRemove',deep);
-                console.log(treeCache.data)
+                console.log(cache.getData())
 
             },
             nodeCreate: function (cache, deep) {
                 console.log('nodeCreate', deep)
-                // console.log(treeCache.data)
+                console.log(cache.getData())
             },
             nodeRemove: function (cache, deep) {
                 console.log('nodeRemove', deep);
-                // console.log(treeCache.data)
+                console.log(cache.getData())
             },
             nodeDataChange: function (cache, deep) {
                 console.log('nodeDataChange', deep);
-                console.log(treeCache.data)
+                console.log(cache.getData())
             }
         });
-        treeCache.start();
+        treeCache.start();*/
 
     // console.log(result)
     }catch (e){

@@ -5,7 +5,7 @@
 'use strict';
 const BaseCache = require('./base-cache');
 
-class PathCache extends BaseCache{
+class PathCache extends BaseCache {
     constructor(client, path) {
         super(client, path);
     }
@@ -22,8 +22,9 @@ class PathCache extends BaseCache{
      * @param nodeType   节点的状态   init:启动或者节点创建时候的状态  node:该节点删除或数据变化时候的状态  child:子节点创建或删除时候的状态
      */
     async listener(nodeType) {
+        const data = this.data.root;
         if (nodeType === 'init' || nodeType === 'node') {
-            this.data.state = await this.client.checkExists()
+            data.state = await this.client.checkExists()
             .unwantedNamespace()
             .setWatcher(this.client, async (_client, event) => {   // 监听创建和删除
                 if (event.getType() === 1) {    // 创建
@@ -31,7 +32,7 @@ class PathCache extends BaseCache{
                     this.callbacks.nodeCreate(this, 0);
                 } else if (event.getType() === 2) { // 删除
                     await this.listener('node');
-                    this.data.data = null;
+                    data.data = null;
                     this.callbacks.nodeRemove(this, 0);
                 } else if (event.getType() === 3) { // 数据变化
                     await this.listener('node');
@@ -40,25 +41,25 @@ class PathCache extends BaseCache{
             })
             .forPath(this.path);
         }
-        if (this.data.state) {
+        if (data.state) {
             if (nodeType === 'init' || nodeType === 'node') {
-                this.data.data = await this.client.getData()
+                data.data = await this.client.getData()
                 .unwantedNamespace()
                 .forPath(this.path);
             }
             if (nodeType === 'init' || nodeType === 'child') {
-                this.data.children = await this.client.getChildren()
+                data.children = await this.client.getChildren()
                 .unwantedNamespace()
                 .setWatcher(this.client, async (_client, event) => {   // 监听创建和删除
                     if (event.getType() === 4) {
                         let oldLen = 0;
                         let newLen;
-                        if (this.data.children instanceof Array) {
-                            oldLen = this.data.children.length;
+                        if (data.children instanceof Array) {
+                            oldLen = data.children.length;
                         }
                         await this.listener('child');
-                        if (this.data.children instanceof Array) {
-                            newLen = this.data.children.length;
+                        if (data.children instanceof Array) {
+                            newLen = data.children.length;
                         }
                         if (newLen > oldLen) this.callbacks.childAdd(this, 0);
                         else this.callbacks.childRemove(this, 0);

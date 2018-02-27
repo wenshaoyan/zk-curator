@@ -49,6 +49,7 @@ class BaseCache {
         this._data = value;
     }
 
+
     get callbacks() {
         return this._callbacks;
     }
@@ -56,7 +57,9 @@ class BaseCache {
     set callbacks(value) {
         this._callbacks = value;
     }
-
+    getData() {
+        return this.data.root;
+    }
     /**
      *
      * @param callbacks
