@@ -27,8 +27,8 @@ class TreeCache extends BaseCache {
     /**
      * 开始cache
      */
-    start() {
-        this.listener('init', this.data, 'root', this.path);
+    async start() {
+        await this.listener('init', this.data, 'root', this.path);
     }
 
     relativeDeep(inputPath) {
