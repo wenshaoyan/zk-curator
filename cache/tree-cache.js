@@ -54,7 +54,6 @@ class TreeCache extends BaseCache {
         if (!(nodeKey in parentData)) {
             const split = parentPath.split('/');
             const id = split[split.length - 1];
-            console.log(id)
             parentData[nodeKey] = {
                 id: id,
                 path: parentPath
@@ -114,7 +113,6 @@ class TreeCache extends BaseCache {
 
             }
         }
-        // console.log(JSON.stringify(this.data))
     }
 }
 
