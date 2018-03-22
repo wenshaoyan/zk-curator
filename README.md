@@ -96,15 +96,21 @@ async function main() {
 
 
 ### cache
-cache为永久监听器，包括NodeCache、PathCache、TreeCache三种。
+cache为永久监听器，包括NodeCache、PathCache、TreeCache三种。node对象数据格式:<br>
+- path : 节点的完整路径。
+- id : 节点的id。
+- state : 节点的状态。
+- data : 节点的数据。
+- childrenData : 子节点的对象，包括迭代子节点的数据。对象的key为子节点的id，value为子节点的node对象。
+- children : 子节点id的数组。
 #### addListener
-增加监听的方法，格式为{eventName:function(cache,deep),...}。<br>
+增加监听的方法，格式为{eventName:function(cache,deep, changeNode),...}。<br>
 eventName包括:
-- childAdd:子节点添加时调用
-- childRemove:子节点删除时调用
-- nodeCreate:节点创建时候调用
-- nodeRemove:节点删除时候调用
-- nodeDataChange:节点数据改变时候调用
+- childAdd:子节点添加时调用, 这里的changeNode为添加后的子节点的node对象。
+- childRemove:子节点删除时调用, 这里的changeNode为删除前的子节点的node对象。
+- nodeCreate:节点创建时候调用, 这里的changeNode为创建后的节点的node对象。
+- nodeRemove:节点删除时候调用, 这里的changeNode为删除前的节点的node对象。
+- nodeDataChange:节点数据改变时候调用, 这里的changeNode为修改前的节点的node对象。
 
 cache: 当前的cache对象()
 #### NodeCache
@@ -112,25 +118,22 @@ cache: 当前的cache对象()
 ```js
 const {NodeCache} = require('zk-curator');
 const nodeCache = new NodeCache(client,'/test/create');
-        nodeCache.addListener({
-            nodeCreate: function (cache, deep) {
-                console.log('nodeCreate')
-                console.log(cache.state)
-                console.log(cache.data)
-            },
-            nodeRemove: function (cache, deep) {
-                console.log('nodeRemove');
-                console.log(cache.state)
-                console.log(cache.data)
+nodeCache.addListener({
+   nodeCreate: function (cache, deep, changeNode) {
+       console.log('nodeCreate', deep, changeNode);
+       console.log(cache.getData());
+   },
+   nodeRemove: function (cache, deep, changeNode) {
+       console.log('nodeRemove', deep, changeNode);
+       console.log(cache.getData());
 
-            },
-            nodeDataChange: function (cache, deep) {
-                console.log('nodeDataChange')
-                console.log(cache.state)
-                console.log(cache.data)
-            }
-        });
-        nodeCache.start();
+   },
+   nodeDataChange: function (cache, deep, changeNode) {
+       console.log('nodeDataChange', deep, changeNode);
+       console.log(cache.getData())
+   }
+});
+nodeCache.start();
 ```
 
 #### PathCache
@@ -138,38 +141,31 @@ const nodeCache = new NodeCache(client,'/test/create');
 ```js
 const {PathCache} = require('zk-curator');
 const pathCache = new PathCache(client,'/test');
-        pathCache.addListener({
-            childAdd: function (cache, deep) {
-                console.log('childAdd');
-                console.log(cache.state);
-                console.log(cache.data)
-                console.log(cache.children)
-            },
-            childRemove: function (cache, deep) {
-                console.log('childRemove');
-                console.log(cache.state);
-                console.log(cache.data)
-                console.log(cache.children)
+pathCache.addListener({
+    childAdd: function (cache, deep, changeNode) {
+        console.log('childAdd', deep, changeNode);
+        console.log(cache.getData())
+    },
+    childRemove: function (cache, deep, changeNode) {
+        console.log('childRemove', deep, changeNode);
+        console.log(cache.getData())
 
-            },
-            nodeCreate: function (cache, deep) {
-                console.log('nodeCreate')
-                console.log(cache.state)
-                console.log(cache.data)
-            },
-            nodeRemove: function (cache, deep) {
-                console.log('nodeRemove');
-                console.log(cache.state)
-                console.log(cache.data)
+    },
+    nodeCreate: function (cache, deep, changeNode) {
+        console.log('nodeCreate', deep, changeNode)
+        console.log(cache.getData())
+    },
+    nodeRemove: function (cache, deep, changeNode) {
+        console.log('nodeRemove', deep, changeNode);
+        console.log(cache.getData())
 
-            },
-            nodeDataChange: function (cache, deep) {
-                console.log('nodeDataChange');
-                console.log(cache.state);
-                console.log(cache.data);
-            }
-        });
-        pathCache.start();
+    },
+    nodeDataChange: function (cache, deep, changeNode) {
+        console.log('nodeDataChange', deep, changeNode);
+        console.log(cache.getData());
+    }
+});
+pathCache.start();
 
 ```
 
@@ -181,28 +177,28 @@ const pathCache = new PathCache(client,'/test');
 ```js
 const {TreeCache} = require('zk-curator');
 const treeCache = new TreeCache(client,'/test', 2);
-        treeCache.addListener({
-            childAdd: function (cache, deep) {
-                console.log('childAdd',deep);
-                console.log(treeCache.data)
-            },
-            childRemove: function (cache, deep) {
-                console.log('childRemove',deep);
-                console.log(treeCache.data)
+treeCache.addListener({
+    childAdd: function (cache, deep, changeNode) {
+        console.log('childAdd', deep, changeNode);
+        console.log(cache.getData())
+    },
+    childRemove: function (cache, deep, changeNode) {
+        console.log('childRemove', deep, changeNode);
+        console.log(cache.getData())
 
-            },
-            nodeCreate: function (cache, deep) {
-                console.log('nodeCreate', deep)
-                // console.log(treeCache.data)
-            },
-            nodeRemove: function (cache, deep) {
-                console.log('nodeRemove', deep);
-                // console.log(treeCache.data)
-            },
-            nodeDataChange: function (cache, deep) {
-                console.log('nodeDataChange', deep);
-                console.log(treeCache.data)
-            }
-        });
-        treeCache.start();
+    },
+    nodeCreate: function (cache, deep, changeNode) {
+        console.log('nodeCreate', deep, changeNode)
+        console.log(cache.getData())
+    },
+    nodeRemove: function (cache, deep, changeNode) {
+        console.log('nodeRemove', deep, changeNode);
+        console.log(cache.getData())
+    },
+    nodeDataChange: function (cache, deep, changeNode) {
+        console.log('nodeDataChange', deep, changeNode);
+        console.log(cache.getData())
+    }
+});
+treeCache.start();
 ```

@@ -5,10 +5,11 @@
 'use strict';
 const BaseCache = require('./base-cache');
 
-class NodeCache extends BaseCache{
+class NodeCache extends BaseCache {
     constructor(client, path) {
         super(client, path);
     }
+
     /**
      * 开始cache
      */
@@ -23,14 +24,16 @@ class NodeCache extends BaseCache{
         .setWatcher(this.client, async (_client, event) => {   // 监听创建和删除
             if (event.getType() === 1) {    // 创建
                 await this.listener();
-                this.callbacks.nodeCreate(this, 0);
+                this.callbacks.nodeCreate(this, 0, BaseCache.deepCopyNode(this.getData()));
             } else if (event.getType() === 2) { // 删除
+                const changeNode = BaseCache.deepCopyNode(this.getData());
                 await this.listener();
                 data.data = null;
-                this.callbacks.nodeRemove(this, 0);
+                this.callbacks.nodeRemove(this, 0, changeNode);
             } else if (event.getType() === 3) {
+                const changeNode = BaseCache.deepCopyNode(this.getData());
                 await this.listener();
-                this.callbacks.nodeDataChange(this, 0);
+                this.callbacks.nodeDataChange(this, 0, changeNode);
             }
         })
         .forPath(this.path);

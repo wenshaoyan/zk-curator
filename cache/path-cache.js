@@ -29,14 +29,16 @@ class PathCache extends BaseCache {
             .setWatcher(this.client, async (_client, event) => {   // 监听创建和删除
                 if (event.getType() === 1) {    // 创建
                     await this.listener('init');
-                    this.callbacks.nodeCreate(this, 0);
+                    this.callbacks.nodeCreate(this, 0, BaseCache.deepCopyNode(this.getData()));
                 } else if (event.getType() === 2) { // 删除
+                    const changeNode = BaseCache.deepCopyNode(this.getData());
                     await this.listener('node');
                     data.data = null;
-                    this.callbacks.nodeRemove(this, 0);
+                    this.callbacks.nodeRemove(this, 0, changeNode);
                 } else if (event.getType() === 3) { // 数据变化
+                    const changeNode = BaseCache.deepCopyNode(this.getData());
                     await this.listener('node');
-                    this.callbacks.nodeDataChange(this, 0);
+                    this.callbacks.nodeDataChange(this, 0, changeNode);
                 }
             })
             .forPath(this.path);
@@ -54,6 +56,7 @@ class PathCache extends BaseCache {
                     if (event.getType() === 4) {
                         let oldLen = 0;
                         let newLen;
+                        const keys1 = new Set(data.children);
                         if (data.children instanceof Array) {
                             oldLen = data.children.length;
                         }
@@ -61,8 +64,17 @@ class PathCache extends BaseCache {
                         if (data.children instanceof Array) {
                             newLen = data.children.length;
                         }
-                        if (newLen > oldLen) this.callbacks.childAdd(this, 0);
-                        else this.callbacks.childRemove(this, 0);
+                        const keys2 = new Set(data.children);
+                        const d1 = [...keys1].filter(x => !keys2.has(x));
+                        const d2 = [...keys2].filter(x => !keys1.has(x));
+                        const changeNode = {};
+                        if (d1.length === 1) {
+                            changeNode.id = d1[0];
+                        } else if (d2.length === 1) {
+                            changeNode.id = d2[0];
+                        }
+                        if (newLen > oldLen) this.callbacks.childAdd(this, 0, changeNode);
+                        else this.callbacks.childRemove(this, 0, changeNode);
                     }
                 })
                 .forPath(this.path);
