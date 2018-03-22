@@ -4,7 +4,34 @@
  */
 'use strict';
 const {switchCallback} = require('./cache-util');
+const recursion =  function (child, path) {
+    for (const id in child) {
+        console.log(child[id])
+        if (child[id].path === path) {
+            return child[id];
+        }
+        return recursion(child[id].childrenData, path);
+    }
+};
+const recursionGetData = function (root, path) {
 
+    if (!root || typeof root.childrenData !== 'object') {
+        return null;
+    }
+    if (root.path === path) {
+        return root;
+    }
+    const child = root.childrenData;
+    // return recursion(root.childrenData, path);
+    for (const id in child) {
+        /*if (child[id].path === path) {
+            return child[id];
+        }*/
+        console.log(id)
+        return recursionGetData(child[id], path);
+    }
+
+};
 class BaseCache {
     constructor(client, path) {
         if (typeof path !== 'string' || path.length === 0 || path[0] !== '/') {
@@ -119,6 +146,14 @@ class BaseCache {
         d1.forEach(k => result.push(nodes1[k]));
         d2.forEach(k => result.push(nodes2[k]));
         return result;
+    }
+
+    setTag(path, tag) {
+        if (typeof path !== 'string' && typeof tag !== 'number') {
+            return false;
+        }
+        const node = recursionGetData(this.getData(), path);
+        console.log('========',node, '==============');
 
     }
 }

@@ -86,7 +86,7 @@ async function main() {
             }
         });
         await treeCache.start();
-
+        treeCache.setTag('/test/4', 1);
         //console.log(treeCache.getData())
     } catch (e) {
         console.log(e)
