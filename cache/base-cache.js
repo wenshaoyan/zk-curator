@@ -4,33 +4,17 @@
  */
 'use strict';
 const {switchCallback} = require('./cache-util');
-const recursion =  function (child, path) {
-    for (const id in child) {
-        console.log(child[id])
-        if (child[id].path === path) {
-            return child[id];
+const recursionGetData = function (child, path) {
+    if (child.path === path) {
+        return child;
+    }
+    for (const k in child.childrenData) {
+        const r = recursionGetData(child.childrenData[k], path);
+        if (r) {
+            return r;
         }
-        return recursion(child[id].childrenData, path);
     }
-};
-const recursionGetData = function (root, path) {
-
-    if (!root || typeof root.childrenData !== 'object') {
-        return null;
-    }
-    if (root.path === path) {
-        return root;
-    }
-    const child = root.childrenData;
-    // return recursion(root.childrenData, path);
-    for (const id in child) {
-        /*if (child[id].path === path) {
-            return child[id];
-        }*/
-        console.log(id)
-        return recursionGetData(child[id], path);
-    }
-
+    return false;
 };
 class BaseCache {
     constructor(client, path) {
@@ -112,6 +96,7 @@ class BaseCache {
                 data: c.data,
                 childrenData: {},
                 children: [],
+                tag: c.tag
             }
         }
         return cs;
@@ -129,6 +114,7 @@ class BaseCache {
             data: c.data,
             childrenData: {},
             children: [],
+            tag: c.tag
         };
     }
 
@@ -148,14 +134,55 @@ class BaseCache {
         return result;
     }
 
+    /**
+     * 对节点设置标签
+     * @param path          节点的完整路径
+     * @param tag           标签  数字类型
+     * @return {boolean}    设置成功为true 失败为false
+     */
     setTag(path, tag) {
         if (typeof path !== 'string' && typeof tag !== 'number') {
             return false;
         }
         const node = recursionGetData(this.getData(), path);
-        console.log('========',node, '==============');
-
+        if (node) {
+            node.tag = tag;
+            return true;
+        }
+        return true;
     }
+
+    /**
+     * 获取节点的标签
+     * @param path          节点的完整路径
+     * @return {*}          如果参数错误或者找不到对应的节点则返回null  否则返回对应的tag
+     */
+    getTag(path) {
+        if (typeof path !== 'string') {
+            return null;
+        }
+        const node = recursionGetData(this.getData(), path);
+        if (node) {
+            return node.tag;
+        }
+        return null;
+    }
+    /**
+     * 获取对应path的node对象
+     * @param path          节点的完整路径
+     * @return {*}          如果参数错误或者找不到对应的节点则返回null  否则返回对应的node
+     */
+    getNode(path) {
+        if (typeof path !== 'string') {
+            return null;
+        }
+        const node = recursionGetData(this.getData(), path);
+        if (node) {
+            return node;
+        }
+        return null;
+    }
+
 }
 
 module.exports = BaseCache;

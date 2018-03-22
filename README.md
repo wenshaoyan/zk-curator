@@ -61,17 +61,17 @@ curatorFrameworkFactor.namespace(str);
 
 
 ##### setLogger 设置日志 
-logger: 推荐使用log4js获取指定日志类 需要包括info等标准方法</br>
+logger: 推荐使用[log42-node](https://github.com/wenshaoyan/log4j2-node)获取指定日志类 需要包括info等标准方法</br>
 curatorFrameworkFactor.setLogger(logger)</br>
 ```js
-const log4js = require('log4js');
-const log4jsConfig = require('../config/log4js.json');
-log4js.configure(log4jsConfig);
+const log4j2 = require('log42-node');
+const log4j2Config = require('../config/log4j2.json');
+log4j2.configure(log4j2Config);
 let client;
 client = CuratorFrameworkFactory.builder()
     .connectString(process.env.ZK_URL)
     .namespace(`http`)
-    .setLogger(log4js.getLogger('zookeeper'))
+    .setLogger(log4j2.getLogger('zookeeper'))
     .build(main);
 client.start();
 

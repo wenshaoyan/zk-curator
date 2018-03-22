@@ -82,11 +82,14 @@ async function main() {
             },
             nodeDataChange: function (cache, deep, changeNode) {
                 console.log('nodeDataChange', deep, changeNode);
+                console.log(changeNode.tag)
                 console.log(cache.getData())
             }
         });
         await treeCache.start();
-        treeCache.setTag('/test/4', 1);
+        const r = treeCache.setTag('/test/4/1', 222);
+        console.log(r)
+
         //console.log(treeCache.getData())
     } catch (e) {
         console.log(e)
