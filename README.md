@@ -103,6 +103,7 @@ cache为永久监听器，包括NodeCache、PathCache、TreeCache三种。node�
 - data : 节点的数据。
 - childrenData : 子节点的对象，包括迭代子节点的数据。对象的key为子节点的id，value为子节点的node对象。
 - children : 子节点id的数组。
+- tag : 标签 (通过setTag设置)。
 #### addListener
 增加监听的方法，格式为{eventName:function(cache,deep, changeNode),...}。<br>
 eventName包括:
@@ -111,8 +112,18 @@ eventName包括:
 - nodeCreate:节点创建时候调用, 这里的changeNode为创建后的节点的node对象。
 - nodeRemove:节点删除时候调用, 这里的changeNode为删除前的节点的node对象。
 - nodeDataChange:节点数据改变时候调用, 这里的changeNode为修改前的节点的node对象。
+#### setTag
+设置标签：setTag(path, tag);<br>
+path: string 要设置节点的完整路径,可通过node.path获取。<br>
+tag: number 要设置节点tag。<br>
+@return: bool 如果path找不到或者tag不为number,则返回false,设置成功返回true
 
-cache: 当前的cache对象()
+#### getTag
+设置标签：getTag(path);<br>
+path: string 要获取节点的完整路径,可通过node.path获取。<br>
+@return: node 如果path找不到则返回null,能找到则返回对应tag
+
+
 #### NodeCache
 监视一个结点的创建、更新、删除，并将结点的数据缓存在本地。NodeCache(Client,path):path节点的路径
 ```js
