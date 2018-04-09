@@ -16,19 +16,42 @@ class CuratorFramework {
         this._client = zookeeper.createClient(curatorFrameworkFactory.address,
             curatorFrameworkFactory.options ? curatorFrameworkFactory.options : undefined);
         this._curatorFrameworkFactory = curatorFrameworkFactory;
-        this._client.once('connected', async () => {
-            if (this.curatorFrameworkFactory.isPrintLog())
-                this.curatorFrameworkFactory.logger.info('zookeeper connect succeed');
-            const createBuilder = this.create()
-            .creatingParentContainersIfNeeded()
-            .unwantedNamespace();
-            try {
-                await createBuilder.forPath(this.curatorFrameworkFactory.space, null);
-            } catch (e) {
-                //console.log(e);
-            }
-            callback();
-        });
+        this._buildPromise = () => {
+            return new Promise(resolve => {
+                this._client.once('connected', async () => {
+                    if (this.curatorFrameworkFactory.isPrintLog())
+                        this.curatorFrameworkFactory.logger.info('zookeeper connect succeed');
+                    const createBuilder = this.create()
+                    .creatingParentContainersIfNeeded()
+                    .unwantedNamespace();
+                    try {
+                        await createBuilder.forPath(this.curatorFrameworkFactory.space, null);
+                    } catch (e) {
+                        //console.log(e);
+                    }
+                    resolve();
+                });
+            })
+        };
+        this._callback = callback;
+
+    }
+
+
+    get callback() {
+        return this._callback;
+    }
+
+    set callback(value) {
+        this._callback = value;
+    }
+
+    get buildPromise() {
+        return this._buildPromise;
+    }
+
+    set buildPromise(value) {
+        this._buildPromise = value;
     }
 
 
@@ -51,10 +74,12 @@ class CuratorFramework {
     /**
      * 连接
      */
-    start() {
+    async start() {
         if (this.curatorFrameworkFactory.isPrintLog())
             this.curatorFrameworkFactory.logger.info('zookeeper connecting..');
         this.client.connect();
+        await this.buildPromise();
+        if (typeof this.callback === 'function') this.callback();
         return this;
     }
 

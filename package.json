@@ -1,6 +1,6 @@
 {
   "name": "zk-curator",
-  "version": "1.0.8",
+  "version": "1.0.10",
   "dependencies": {
     "node-zookeeper-client": "^0.2.2"
   },
